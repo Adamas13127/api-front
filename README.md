@@ -1,73 +1,88 @@
-# React + TypeScript + Vite
+# Shop Admin Front – Interface d’administration
+Frontend React (Vite + TypeScript) pour l’application **Shop Admin**.  
+Cette interface permet de se connecter, de consulter les produits et, pour les administrateurs, de gérer le catalogue via l’API NestJS sécurisée.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+---
 
-Currently, two official plugins are available:
+## Rôle de l’application
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Connexion d’un utilisateur via email / mot de passe.
+- Stockage local des tokens (`accessToken`, `refreshToken`) et des informations utilisateur.
+- Affichage de la liste des produits (lecture publique).
+- Accès à des actions protégées (création / modification / suppression de produits) pour les comptes ayant le rôle `admin`.
+- Affichage du profil utilisateur en consommant `/auth/profile`.
 
-## React Compiler
+Le front communique avec le backend via un client Axios configuré dans `src/api/client.ts` :
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Ajout automatique du header `Authorization: Bearer <accessToken>`.
+- Gestion automatique du `refreshToken` en cas de réponse `401`.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Déploiement en ligne
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Frontend : `https://api-front-k1nhgt6pj-semmaches-projects.vercel.app`
+- Backend API : `https://api-back-umber.vercel.app/api/v1`
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Le CORS côté backend est configuré pour n’autoriser que cette URL de frontend.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+## Installation et lancement en local
+
+### Prérequis
+
+- Node.js (version récente, 18+ recommandé)
+- npm
+- Backend NestJS démarré en local (ou déployé en ligne)
+
+### Installation
+
+Depuis le dossier `api-front` :
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Configuration de l’URL de l’API
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Le front utilise la variable d’environnement `VITE_API_URL` pour connaître l’URL de l’API.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Créer un fichier `.env` dans `api-front` (non commité) :
+
+```env
+VITE_API_URL=http://localhost:3000/api/v1
+```
+
+En production sur Vercel, cette valeur est configurée dans les variables d’environnement du projet.
+
+### Démarrage en développement
+
+```bash
+npm run dev
+```
+
+Puis ouvrir l’URL indiquée par Vite (par défaut `http://localhost:5173`).
+
+---
+
+## Aperçu des pages
+
+- Login : formulaire de connexion (email, mot de passe) qui appelle `/auth/login`.
+- Produits : liste des produits exposés par `/products`.
+- Profil : informations de l’utilisateur courant via `/auth/profile`.
+
+Les routes protégées côté front s’appuient sur le contexte d’authentification défini dans `src/auth/AuthContext.tsx`.
+
+---
+
+## Lien avec le backend
+
+Ce frontend est conçu pour fonctionner avec l’API NestJS du dossier `api-back` :
+
+- Authentification JWT + refresh token.
+- Ressource `Product` avec CRUD complet.
+- Documentation Swagger disponible à `https://api-back-umber.vercel.app/api/docs`.
+
+
 ```
