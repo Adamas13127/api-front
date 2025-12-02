@@ -62,17 +62,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string) => {
-    // login -> récupère access + refresh
+    // 1) Login → récupère tokens + user
     const res = await api.post('/auth/login', { email, password });
-
-    localStorage.setItem('accessToken', res.data.accessToken);
-    localStorage.setItem('refreshToken', res.data.refreshToken);
-
-    // récupère le profil avec le nouveau token
-    const profile = await api.get('/auth/profile');
-    setUser(profile.data);
-    localStorage.setItem('user', JSON.stringify(profile.data));
+  
+    const { accessToken, refreshToken, user } = res.data;
+  
+    // 2) Stocker les tokens
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
+  
+    // 3) Stocker l'user (celui renvoyé par le backend)
+    setUser(user);
+    localStorage.setItem('user', JSON.stringify(user));
   };
+  
 
   const logout = () => {
     localStorage.removeItem('accessToken');
