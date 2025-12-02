@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom';
 const LoginPage: React.FC = () => {
   const { login } = useAuth();
   const nav = useNavigate();
-  const [email, setEmail] = useState('admin1@test.com');
-  const [password, setPassword] = useState('Admin!123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
