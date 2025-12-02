@@ -27,7 +27,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User>(null);
   const [loading, setLoading] = useState(true);
 
-  // Au chargement, on essaie de réhydrater depuis localStorage
+  // 🔹 Au chargement : on relit juste le user + les tokens depuis localStorage
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
     const accessToken = localStorage.getItem('accessToken');
@@ -40,42 +40,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
 
-    if (!accessToken) {
-      setLoading(false);
-      return;
-    }
-
-    // On vérifie que le token est toujours valide (et ça peut déclencher un refresh via l'interceptor)
-    api
-      .get('/auth/profile')
-      .then((res) => {
-        setUser(res.data);
-        localStorage.setItem('user', JSON.stringify(res.data));
-      })
-      .catch(() => {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('user');
-        setUser(null);
-      })
-      .finally(() => setLoading(false));
+    setLoading(false);
   }, []);
 
+  // 🔹 LOGIN : on utilise directement la réponse du backend
   const login = async (email: string, password: string) => {
-    // 1) Login → récupère tokens + user
     const res = await api.post('/auth/login', { email, password });
-  
-    const { accessToken, refreshToken, user } = res.data;
-  
-    // 2) Stocker les tokens
+
+    const { accessToken, refreshToken, user: userData } = res.data;
+
     localStorage.setItem('accessToken', accessToken);
     localStorage.setItem('refreshToken', refreshToken);
-  
-    // 3) Stocker l'user (celui renvoyé par le backend)
-    setUser(user);
-    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem('user', JSON.stringify(userData));
+
+    setUser(userData);
   };
-  
 
   const logout = () => {
     localStorage.removeItem('accessToken');

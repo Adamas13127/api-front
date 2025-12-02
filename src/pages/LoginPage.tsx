@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom';
 const LoginPage: React.FC = () => {
   const { login } = useAuth();
   const nav = useNavigate();
-  const [email, setEmail] = useState('admin@test.com');
-  const [password, setPassword] = useState('123456');
+  const [email, setEmail] = useState('admin1@test.com');
+  const [password, setPassword] = useState('Admin!123');
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -14,7 +14,7 @@ const LoginPage: React.FC = () => {
     setError('');
     try {
       await login(email, password);
-      nav('/');
+      nav('/products');
     } catch (err: any) {
       console.log('LOGIN ERROR ===>', err.response?.data || err.message || err);
       setError('Impossible de te connecter. Vérifie les identifiants.');
